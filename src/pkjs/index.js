@@ -10,8 +10,16 @@ ApiHelper.prototype.fetchRespone = function(endpoint, type) {
   this.xhrRequest(url, type, this.handleResponse);
 };
 
-ApiHelper.prototype.handleResponse = function(responseText, self) {
-  var data = JSON.parse(responseText);
+ApiHelper.prototype.handleResponse = function(responseText, xhr, self) {
+  var data = {};
+  if (xhr.status === 200) {
+    data = JSON.parse(responseText);
+    localStorage.setItem('assignment_data', responseText);
+  } else {
+    data = JSON.parse(localStorage.getItem('assignment_data')) || [];
+    console.log(JSON.stringify(data));
+  }
+  
   var nextTwo = [];
   
   // Grab the next two assignments
@@ -48,21 +56,16 @@ ApiHelper.prototype.timeUntilDue = function(assignment) {
   return Math.round(time * 10) / 10 + ' ' + label;
 };
 
-
 ApiHelper.prototype.errorHandler = function(e) {
   console.log("Error sending response to Pebble.");
   console.log(e);
-};
-
-ApiHelper.prototype.xhrRequest = function(e) {
-  console.log("Success sending response to Pebble.");
 };
 
 ApiHelper.prototype.xhrRequest = function(url, type, callback) {
     var xhr = new XMLHttpRequest();
     var self = this;
     xhr.onload = function () {
-      callback(this.responseText, self);
+      callback(this.responseText, xhr, self);
     };
     xhr.open(type, url);
     xhr.setRequestHeader("Authorization","Bearer " + this.token);

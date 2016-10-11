@@ -30,6 +30,15 @@ static void update_time() {
   strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);
   text_layer_set_text(s_time_layer, s_buffer);
   layer_mark_dirty(s_canvas_layer);
+  
+  if (tick_time->tm_min % 5 == 0) {
+    // Send request to update assignment data
+    DictionaryIterator *iter;
+    app_message_outbox_begin(&iter);
+    dict_write_uint8(iter, 0, 0);
+    app_message_outbox_send();
+  }
+  
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -110,7 +119,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *first_time_tuple = dict_find(iterator, MESSAGE_KEY_FIRST_DUE);
   Tuple *second_time_tuple = dict_find(iterator, MESSAGE_KEY_SECOND_DUE);
   
-  if (first_title_tuple && second_title_tuple) {
+  if (first_title_tuple && second_title_tuple && first_time_tuple && second_time_tuple) {
     snprintf(first_title_buffer, sizeof(first_title_buffer), "%s", first_title_tuple->value->cstring);
     snprintf(second_title_buffer, sizeof(second_title_buffer), "%s", second_title_tuple->value->cstring);
     snprintf(first_time_buffer, sizeof(first_time_buffer), "%s", first_time_tuple->value->cstring);
