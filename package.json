@@ -6,12 +6,22 @@
     "pebble": {
         "displayName": "Panda Face",
         "enableMultiJS": true,
-        "messageKeys": [],
+        "messageKeys": [
+            "FIRST_ASSIGN",
+            "SECOND_ASSIGN",
+            "FIRST_DUE",
+            "SECOND_DUE"
+        ],
         "projectType": "native",
         "resources": {
             "media": []
         },
         "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk"
+        ],
         "uuid": "3adcb4c2-20aa-42a0-ab15-333ffb519a82",
         "watchapp": {
             "watchface": false
