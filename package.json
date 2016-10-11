@@ -1,0 +1,21 @@
+{
+    "author": "wdrans@gmail.com",
+    "dependencies": {},
+    "keywords": [],
+    "name": "panda-face",
+    "pebble": {
+        "displayName": "Panda Face",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "uuid": "3adcb4c2-20aa-42a0-ab15-333ffb519a82",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
