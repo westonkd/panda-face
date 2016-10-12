@@ -4,21 +4,33 @@ $(document).ready(function(){
 });
 
 function tokenRequest(callback) {
-  var url = localStorage.getItem('base_url') + "/login/oauth2/token";
-  var data = {
+  var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
+  var postData = {
       'grant_type': 'authorization_code',
       'client_id': localStorage.getItem('app_id'),
       'client_secret': localStorage.getItem('user_key'),
       'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
       'code': localStorage.getItem('code')
   };
-  $.post(url,
-    data,
-    function(returnedData){
-         console.log(returnedData);
-    }).fail(function(result){
-          console.log("error");
-    });
+
+  console.log("======================================");
+  console.log(url);
+  console.log("--------------------------------------");
+  console.log(data);
+  console.log("======================================");
+
+$.ajax({
+  type: 'POST',
+  url: tokenUrl,
+  data: postData,
+  success: function(res) {
+    console.log(res);
+  },
+  error: function(res) {
+    console.log("ERROR");
+    console.log(res);
+  }
+});
 }
 
 function oauthCode() {
