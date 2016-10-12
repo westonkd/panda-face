@@ -4,6 +4,9 @@
     "keywords": [],
     "name": "panda-face",
     "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
         "displayName": "Panda Face",
         "enableMultiJS": true,
         "messageKeys": [

@@ -91,7 +91,6 @@ ApiHelper.prototype.xhrRequest = function(url, type, callback) {
 
 ApiHelper.prototype.completeAssignments = function(assignments) {
   var complete = 0;
-  console.log(JSON.stringify(assignments));
   for (var i = 0; i < assignments.length; i++) {
     if (assignments[i].type === 'assignment' && assignments[i].assignment.has_submitted_submissions) {
       complete++;
@@ -120,3 +119,7 @@ Pebble.addEventListener('appmessage',
     getUpcomingEvents();
   }                     
 );
+
+Pebble.addEventListener("showConfiguration", function() {
+  Pebble.openURL('https://westonkd.github.io/panda-face/');
+});
