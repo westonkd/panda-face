@@ -7,19 +7,18 @@ function ApiHelper(baseUrl, token) {
 
 ApiHelper.prototype.fetchRespone = function(endpoint, type) {
   var url = this.baseUrl + endpoint;
-  this.xhrRequest(url, type, this.handleResponse);
+  if (navigator.onLine) {
+    console.log("online");
+    this.xhrRequest(url, type, this.handleResponse);
+  } else {
+    var data = localStorage.getItem('assignment_data');
+    this.handleResponse(data, {}, this);
+  }
 };
 
 ApiHelper.prototype.handleResponse = function(responseText, xhr, self) {
-  var data = {};
-  if (xhr.status === 200) {
-    data = JSON.parse(responseText);
-    localStorage.setItem('assignment_data', responseText);
-  } else {
-    data = JSON.parse(localStorage.getItem('assignment_data')) || [];
-    console.log(JSON.stringify(data));
-  }
-  
+  localStorage.setItem('assignment_data', responseText);
+  var data = JSON.parse(responseText);
   var nextTwo = [];
   
   // Grab the next two assignments
@@ -70,6 +69,17 @@ ApiHelper.prototype.xhrRequest = function(url, type, callback) {
     xhr.open(type, url);
     xhr.setRequestHeader("Authorization","Bearer " + this.token);
     xhr.send();
+};
+
+ApiHelper.prototype.banana = function(one, two) {
+  var dictionary = {
+    'FIRST_ASSIGN': "one",
+    'FIRST_DUE': "Two",
+    'SECOND_ASSIGN': "three",
+    'SECOND_DUE': "four"
+  };
+  
+  Pebble.sendAppMessage(dictionary, this.successHandler, this.errorHandler);
 };
 
 
