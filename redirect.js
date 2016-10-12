@@ -1,11 +1,7 @@
 $(document).ready(function(){
   localStorage.setItem('code', oauthCode());
-  tokenRequest(tokenSuccess);
+  tokenRequest();
 });
-
-function tokenSuccess(res) {
-  console.log(res);
-}
 
 function tokenRequest(callback) {
   var url = localStorage.getItem('base_url') + "/login/oauth2/token";
@@ -18,7 +14,7 @@ function tokenRequest(callback) {
       'code': localStorage.getItem('code')
     },
     function(returnedData){
-         callback(returnedData);
+         console.log(returnedData);
     }).fail(function(){
           console.log("error");
     });
