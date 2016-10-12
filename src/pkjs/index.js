@@ -7,13 +7,27 @@ function ApiHelper(baseUrl, token) {
 
 ApiHelper.prototype.fetchRespone = function(endpoint, type) {
   var url = this.baseUrl + endpoint;
-  if (navigator.onLine) {
-    console.log("online");
+  //navigator.onLine
+  if (true) {
     this.xhrRequest(url, type, this.handleResponse);
   } else {
     var data = localStorage.getItem('assignment_data');
-    this.handleResponse(data, {}, this);
+    if (data) {
+      this.handleResponse(data, {}, this);
+    } else {
+      this.sendError("No Connection");
+    }
   }
+};
+
+ApiHelper.prototype.sendError = function(message) {
+  var dictionary = {
+    'FIRST_ASSIGN': 'Error',
+    'FIRST_DUE': message,
+    'SECOND_ASSIGN': '',
+    'SECOND_DUE': ''
+  };
+  Pebble.sendAppMessage(dictionary, this.successHandler, this.errorHandler);
 };
 
 ApiHelper.prototype.handleResponse = function(responseText, xhr, self) {
@@ -33,8 +47,10 @@ ApiHelper.prototype.handleResponse = function(responseText, xhr, self) {
   var dictionary = {
     'FIRST_ASSIGN': nextTwo.length > 0 ? nextTwo[0].title : this.defaultText,
     'FIRST_DUE': nextTwo.length > 0 ? self.timeUntilDue(nextTwo[0]) : self.defaultTime,
+    'FIRST_POINTS': nextTwo.length > 0 ? nextTwo[0].assignment.points_possible.toString() :'0',
     'SECOND_ASSIGN': nextTwo.length > 1 ? nextTwo[1].title : this.defaultText,
     'SECOND_DUE': nextTwo.length > 0 ? self.timeUntilDue(nextTwo[1]) : self.defaultTime,
+    'SECOND_POINTS': nextTwo.length > 0 ? nextTwo[1].assignment.points_possible.toString() : '0',
   };
   
   Pebble.sendAppMessage(dictionary, self.successHandler, self.errorHandler);
@@ -69,17 +85,6 @@ ApiHelper.prototype.xhrRequest = function(url, type, callback) {
     xhr.open(type, url);
     xhr.setRequestHeader("Authorization","Bearer " + this.token);
     xhr.send();
-};
-
-ApiHelper.prototype.banana = function(one, two) {
-  var dictionary = {
-    'FIRST_ASSIGN': "one",
-    'FIRST_DUE': "Two",
-    'SECOND_ASSIGN': "three",
-    'SECOND_DUE': "four"
-  };
-  
-  Pebble.sendAppMessage(dictionary, this.successHandler, this.errorHandler);
 };
 
 

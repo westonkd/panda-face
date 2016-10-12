@@ -11,7 +11,8 @@
             "SECOND_ASSIGN",
             "FIRST_DUE",
             "SECOND_DUE",
-            "FIRST_MILLISECONDS"
+            "FIRST_POINTS",
+            "SECOND_POINTS"
         ],
         "projectType": "native",
         "resources": {

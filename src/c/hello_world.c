@@ -4,7 +4,11 @@
 #define TIME_MARGIN 8 * STANDARD_MARGIN
 #define ASSIGN_MARGIN 13 * STANDARD_MARGIN
 #define INFOBAR_HEIGHT 15
+#define ASSIGN_INFO_HEIGHT 15
+#define ASSIGN_INFO_WIDTH 80
+#define INFO_MARGIN_WIDTH 55
 #define ASSIGNMENT_HEIGHT 90
+#define BATTERY_WIDTH 30
 
 #define INBOX_SIZE 1024
 #define OUTBOX_SIZE 256
@@ -12,11 +16,15 @@
 static Window *s_main_window;    // parent window
 static Layer *s_canvas_layer;    // Canvas layer
 static TextLayer *s_time_layer;  // Time label
+static int s_battery_level;
 
 static char first_title_buffer[256];
 static char second_title_buffer[256];
 static char first_time_buffer[128];
 static char second_time_buffer[128];
+static char first_points_buffer[128];
+static char second_points_buffer[128];
+static char date_buffer[64];
 
 /*********************************************
 * Time services
@@ -28,7 +36,11 @@ static void update_time() {
   
   static char s_buffer[8];
   strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);
+  strftime(date_buffer, sizeof(date_buffer), "%F", tick_time);
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox %s", date_buffer);
+  
   text_layer_set_text(s_time_layer, s_buffer);
+  
   layer_mark_dirty(s_canvas_layer);
   
   if (tick_time->tm_min % 5 == 0) {
@@ -46,6 +58,17 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 /***********************************************
+* Battery callback
+***********************************************/
+static void battery_callback(BatteryChargeState state) {
+  //Record the new battery level
+  s_battery_level = state.charge_percent;
+  
+  // Redraw
+  layer_mark_dirty(s_canvas_layer);
+}
+
+/***********************************************
 * Canvas layer services
 ***********************************************/
 static void draw_status_rec(GContext *ctx, GRect bounds) {
@@ -58,7 +81,7 @@ static void draw_status_rec(GContext *ctx, GRect bounds) {
     graphics_fill_rect(ctx, status_box, 0, GCornersAll);
 }
 
-static void draw_assignment(char title[], char due[], GContext *ctx, GRect bounds, GRect time_bounds) {
+static void draw_assignment(char title[], char due[], char points[], GContext *ctx, GRect bounds, GRect points_bounds) {
     graphics_context_set_text_color(ctx, GColorBlack);
     graphics_draw_text(ctx, 
                      title, 
@@ -68,12 +91,42 @@ static void draw_assignment(char title[], char due[], GContext *ctx, GRect bound
                      GTextAlignmentLeft, 
                      NULL);
     graphics_draw_text(ctx, 
-                     due, 
+                     points, 
                      fonts_get_system_font(FONT_KEY_GOTHIC_14), 
+                     points_bounds, 
+                     GTextOverflowModeTrailingEllipsis, 
+                     GTextAlignmentLeft, 
+                     NULL);
+    GRect time_bounds = GRect(points_bounds.origin.x + INFO_MARGIN_WIDTH, points_bounds.origin.y, ASSIGN_INFO_WIDTH, ASSIGN_INFO_HEIGHT);
+    graphics_draw_text(ctx, 
+                     due, 
+                     fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD), 
                      time_bounds, 
                      GTextOverflowModeTrailingEllipsis, 
                      GTextAlignmentLeft, 
-                     NULL);  
+                     NULL);
+}
+
+static void draw_battery(GContext *ctx, GRect bounds) {
+  char battery_level[] = "0000";
+  snprintf(battery_level, sizeof(battery_level), "%3d%%", s_battery_level);
+  graphics_draw_text(ctx, 
+                     battery_level, 
+                     fonts_get_system_font(FONT_KEY_GOTHIC_14), 
+                     GRect(bounds.size.w - BATTERY_WIDTH - STANDARD_MARGIN,0, BATTERY_WIDTH, INFOBAR_HEIGHT), 
+                     GTextOverflowModeTrailingEllipsis, 
+                     GTextAlignmentLeft, 
+                     NULL);
+}
+
+static void draw_date(GContext *ctx, GRect bounds) {
+  graphics_draw_text(ctx, 
+                     date_buffer, 
+                     fonts_get_system_font(FONT_KEY_GOTHIC_14), 
+                     GRect(STANDARD_MARGIN, 0, BATTERY_WIDTH * 3, INFOBAR_HEIGHT), 
+                     GTextOverflowModeTrailingEllipsis, 
+                     GTextAlignmentLeft, 
+                     NULL);
 }
 
 static void draw_assingment_info(GContext *ctx, GRect bounds) {
@@ -88,12 +141,12 @@ static void draw_assingment_info(GContext *ctx, GRect bounds) {
   // First Assignment
   GRect first_bounds = GRect(STANDARD_MARGIN, bounds.size.h - ASSIGNMENT_HEIGHT + STANDARD_MARGIN, bounds.size.w - STANDARD_MARGIN, 15);
   GRect first_time_bounds =  GRect(STANDARD_MARGIN, bounds.size.h - ASSIGNMENT_HEIGHT + TIME_MARGIN, first_bounds.size.w, first_bounds.size.h);
-  draw_assignment(first_title_buffer, first_time_buffer, ctx, first_bounds, first_time_bounds);
+  draw_assignment(first_title_buffer, first_time_buffer, first_points_buffer, ctx, first_bounds, first_time_bounds);
   
   // Second Assignment
   GRect second_bounds = GRect(STANDARD_MARGIN, bounds.size.h - ASSIGNMENT_HEIGHT + ASSIGN_MARGIN, bounds.size.w - STANDARD_MARGIN, 15);
   GRect second_time_bounds =  GRect(STANDARD_MARGIN, bounds.size.h - ASSIGNMENT_HEIGHT + (STANDARD_MARGIN * 20), first_bounds.size.w, first_bounds.size.h);
-  draw_assignment(second_title_buffer, second_time_buffer, ctx, second_bounds, second_time_bounds);
+  draw_assignment(second_title_buffer, second_time_buffer, second_points_buffer, ctx, second_bounds, second_time_bounds);
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -108,6 +161,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   
   // Draw assignment info
   draw_assingment_info(ctx, bounds);
+  
+  // Draw battery
+  draw_battery(ctx, bounds);
+  
+  // Draw date
+  draw_date(ctx, bounds);
 }
 
 /*********************************************
@@ -118,12 +177,16 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *second_title_tuple = dict_find(iterator, MESSAGE_KEY_SECOND_ASSIGN);
   Tuple *first_time_tuple = dict_find(iterator, MESSAGE_KEY_FIRST_DUE);
   Tuple *second_time_tuple = dict_find(iterator, MESSAGE_KEY_SECOND_DUE);
+  Tuple *first_points_tuple = dict_find(iterator, MESSAGE_KEY_FIRST_POINTS);
+  Tuple *second_points_tuple = dict_find(iterator, MESSAGE_KEY_SECOND_POINTS);
   
   if (first_title_tuple && second_title_tuple && first_time_tuple && second_time_tuple) {
     snprintf(first_title_buffer, sizeof(first_title_buffer), "%s", first_title_tuple->value->cstring);
     snprintf(second_title_buffer, sizeof(second_title_buffer), "%s", second_title_tuple->value->cstring);
     snprintf(first_time_buffer, sizeof(first_time_buffer), "%s", first_time_tuple->value->cstring);
     snprintf(second_time_buffer, sizeof(second_time_buffer), "%s", second_time_tuple->value->cstring);
+    snprintf(first_points_buffer, sizeof(first_points_buffer), "%3s Pts. - ", first_points_tuple->value->cstring);
+    snprintf(second_points_buffer, sizeof(second_points_buffer), "%3s Pts. - ", second_points_tuple->value->cstring);
     
     layer_mark_dirty(s_canvas_layer);
   }
@@ -167,6 +230,9 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(window), s_canvas_layer);
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
   
+  // Check battery
+  battery_callback(battery_state_service_peek());
+  
   layer_mark_dirty(s_canvas_layer);
 }
 
@@ -192,8 +258,12 @@ static void init() {
   // Open AppMessage
   app_message_open(INBOX_SIZE, OUTBOX_SIZE);
   
+  // Subscribe to tick handler
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   update_time();
+  
+  // Register Battery handler and initialize 
+  battery_state_service_subscribe(battery_callback);
 }
 
 static void deinit() {
