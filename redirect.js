@@ -5,14 +5,15 @@ $(document).ready(function(){
 
 function tokenRequest(callback) {
   var url = localStorage.getItem('base_url') + "/login/oauth2/token";
-  $.post(url,
-    {
+  var data = {
       'grant_type': 'authorization_code',
       'client_id': localStorage.getItem('app_id'),
       'client_secret': localStorage.getItem('user_key'),
       'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
       'code': localStorage.getItem('code')
-    },
+  };
+  $.post(url,
+    data,
     function(returnedData){
          console.log(returnedData);
     }).fail(function(){
