@@ -20,13 +20,13 @@ function tokenRequest(callback) {
   console.log("======================================");
 
 $.ajax({
-  type: 'POST',
-  url: tokenUrl,
-  data: postData,
-  success: function(res) {
+  'type': 'POST',
+  'url': tokenUrl,
+  'data': postData,
+  'success': function(res) {
     console.log(res);
   },
-  error: function(res) {
+  'error': function(res) {
     console.log("ERROR");
     console.log(res);
   }
