@@ -1,6 +1,6 @@
 $(document).ready(function(){
   localStorage.setItem('code', oauthCode());
-  window.location = 'pebblejs://close';
+  window.location = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(oauthCode()));
 });
 
 function tokenRequest(callback) {
@@ -38,7 +38,7 @@ function oauthCode() {
   var splitUrl = window.location.toString().split('?');
   if (splitUrl.length > 1 && splitUrl[1].indexOf('code') > -1) {
     queryHash = QueryStringToHash(splitUrl[1]);
-    return queryHash.code;
+    return {'code': queryHash.code};
   }
 
   return undefined;
