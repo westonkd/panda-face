@@ -112,7 +112,7 @@ static void draw_battery(GContext *ctx, GRect bounds) {
   snprintf(battery_level, sizeof(battery_level), "%3d%%", s_battery_level);
   graphics_draw_text(ctx, 
                      battery_level, 
-                     fonts_get_system_font(FONT_KEY_GOTHIC_14), 
+                     fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD), 
                      GRect(bounds.size.w - BATTERY_WIDTH - STANDARD_MARGIN,0, BATTERY_WIDTH, INFOBAR_HEIGHT), 
                      GTextOverflowModeTrailingEllipsis, 
                      GTextAlignmentLeft, 
@@ -122,7 +122,7 @@ static void draw_battery(GContext *ctx, GRect bounds) {
 static void draw_date(GContext *ctx, GRect bounds) {
   graphics_draw_text(ctx, 
                      date_buffer, 
-                     fonts_get_system_font(FONT_KEY_GOTHIC_14), 
+                     fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD), 
                      GRect(STANDARD_MARGIN, 0, BATTERY_WIDTH * 3, INFOBAR_HEIGHT), 
                      GTextOverflowModeTrailingEllipsis, 
                      GTextAlignmentLeft, 

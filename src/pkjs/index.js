@@ -8,7 +8,7 @@ function ApiHelper(baseUrl, token) {
 ApiHelper.prototype.fetchRespone = function(endpoint, type) {
   var url = this.baseUrl + endpoint;
   //navigator.onLine
-  if (true) {
+  if (navigator.onLine) {
     this.xhrRequest(url, type, this.handleResponse);
   } else {
     var data = localStorage.getItem('assignment_data');
@@ -99,7 +99,31 @@ ApiHelper.prototype.completeAssignments = function(assignments) {
   return complete;
 };
 
-
+function tokenRequest() {
+  var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
+  var formData = "grant_type=authorization_code" +
+                "&client_id=" + localStorage.getItem('base_url') +
+                "&client_secret=" + localStorage.getItem('user_key') +
+                "&redirect_uri=" + "https://westonkd.github.io/panda-face/redirect" +
+                "&code=" + localStorage.getItem('code');
+  console.log("FormData: " + formData);
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", tokenUrl, true);
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.setRequestHeader("Content-length", formData.length);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        console.log(">>>>>>>>>>>>>>>");
+        console.log(xhr.responseText);
+      } else {
+        console.log("Error:" + xhr.status);
+      }  
+    }
+  };
+  xhr.send(formData);
+}
 
 function getUpcomingEvents() {
   var baseUrl = "http://wdransfield.instructure.com";
@@ -122,4 +146,10 @@ Pebble.addEventListener('appmessage',
 
 Pebble.addEventListener("showConfiguration", function() {
   Pebble.openURL('https://westonkd.github.io/panda-face/');
+});
+
+Pebble.addEventListener('webviewclosed', function(e) {
+  console.log("++++++");
+  console.log(e.response);
+  //tokenRequest();
 });
