@@ -14,7 +14,7 @@ function tokenRequest(callback) {
   };
 
   console.log("======================================");
-  console.log(url);
+  console.log(tokenUrl);
   console.log("--------------------------------------");
   console.log(data);
   console.log("======================================");
