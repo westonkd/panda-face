@@ -34,8 +34,6 @@ function oauthCode() {
     queryHash = QueryStringToHash(splitUrl[1]);
     return {
       'code': queryHash.code,
-      'client_id': ocalStorage.getItem('app_id'),
-      'client_secret': localStorage.getItem('user_key'),
       'redirect_uri': "https://westonkd.github.io/panda-face/redirect"
     };
   }
