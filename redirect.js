@@ -1,6 +1,6 @@
 $(document).ready(function(){
   localStorage.setItem('code', oauthCode());
-  tokenRequest();
+  window.location = 'pebblejs://close';
 });
 
 function tokenRequest(callback) {
