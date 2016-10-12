@@ -3,6 +3,10 @@ $(document).ready(function(){
   tokenRequest(tokenSuccess);
 });
 
+function tokenSucces(res) {
+  console.log(res);
+}
+
 function tokenRequest(callback) {
   var url = localStorage.getItem('base_url') + "/login/oauth2/token";
   $.post(url,
@@ -14,7 +18,7 @@ function tokenRequest(callback) {
       'code': localStorage.getItem('code')
     },
     function(returnedData){
-         console.log(returnedData);
+         callback(returnedData);
     }).fail(function(){
           console.log("error");
     });
