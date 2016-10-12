@@ -3,32 +3,21 @@ $(document).ready(function(){
   tokenRequest(tokenSuccess);
 });
 
-function tokenSuccess(responseText, xhr) {
-  console.log(responseText);
-}
-
 function tokenRequest(callback) {
   var url = localStorage.getItem('base_url') + "/login/oauth2/token";
-  var params = "grant_type=authorization_code" +
-               "&client_id=" + localStorage.getItem('base_url') +
-               "&client_secret=" + localStorage.getItem('user_key') +
-               "&redirect_uri=" + "https://westonkd.github.io/panda-face/redirect" +
-               "&code=" + localStorage.getItem('code');
-  var xhr = new XMLHttpRequest();
-
-  xhr.open('POST', url, true);
-  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      callback(xhr.responseText, xhr);
-    } else if (xhr.readyState == 4) {
-      console.log("ERROR!");
-      console.log(xhr);
-    }
-  };
-
-  xhr.send(params);
+  $.post(url,
+    {
+      'grant_type': 'authorization_code',
+      'client_id': localStorage.getItem('app_id'),
+      'client_secret': localStorage.getItem('user_key'),
+      'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
+      'code': localStorage.getItem('code');
+    },
+    function(returnedData){
+         console.log(returnedData);
+    }).fail(function(){
+          console.log("error");
+    });
 }
 
 function oauthCode() {
