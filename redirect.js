@@ -35,7 +35,7 @@ function oauthCode() {
     var data = {
       'code': queryHash.code,
       'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
-      'not_working': localStorage.getItem('user_key') ? 'not null': 'null';
+      'not_working': window.localStorage.getItem('user_key') ? 'not null': 'null';
     };
     return data;
   }
