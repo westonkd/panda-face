@@ -3,7 +3,7 @@ $(document).ready(function(){
   tokenRequest(tokenSuccess);
 });
 
-function tokenSucces(res) {
+function tokenSuccess(res) {
   console.log(res);
 }
 
