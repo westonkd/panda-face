@@ -11,7 +11,7 @@ function tokenRequest(callback) {
       'client_id': localStorage.getItem('app_id'),
       'client_secret': localStorage.getItem('user_key'),
       'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
-      'code': localStorage.getItem('code');
+      'code': localStorage.getItem('code')
     },
     function(returnedData){
          console.log(returnedData);
