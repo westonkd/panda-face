@@ -26,11 +26,10 @@ function tokenRequest(callback) {
       success: function(data, textStatus, jqXHR) {
         console.log(data);
       },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.log(error);
+      error: function (xhr, textStatus, errorThrown) {
         console.log(errorThrown);
         console.log(textStatus);
-        console.log(jqXHR);
+        console.log(xhr);
       }
   });
 }
