@@ -1,6 +1,6 @@
 $(document).ready(function(){
   localStorage.setItem('code', oauthCode());
-  window.close();
+  window.location = "http://local.panda-face.pebbleapp";
 });
 
 function oauthCode() {
