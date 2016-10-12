@@ -34,7 +34,8 @@ function oauthCode() {
     queryHash = QueryStringToHash(splitUrl[1]);
     return {
       'code': queryHash.code,
-      'redirect_uri': "https://westonkd.github.io/panda-face/redirect"
+      'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
+      'not_working': localStorage.getItem('user_key') ? 'not null': 'null';
     };
   }
 
