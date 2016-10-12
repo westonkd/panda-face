@@ -13,12 +13,6 @@ function tokenRequest(callback) {
       'code': localStorage.getItem('code')
   };
 
-  console.log("======================================");
-  console.log(tokenUrl);
-  console.log("--------------------------------------");
-  console.log(formData);
-  console.log("======================================");
-
   $.ajax({
       url : tokenUrl,
       type: "POST",
@@ -38,7 +32,12 @@ function oauthCode() {
   var splitUrl = window.location.toString().split('?');
   if (splitUrl.length > 1 && splitUrl[1].indexOf('code') > -1) {
     queryHash = QueryStringToHash(splitUrl[1]);
-    return {'code': queryHash.code};
+    return {
+      'code': queryHash.code,
+      'client_id': ocalStorage.getItem('app_id'),
+      'client_secret': localStorage.getItem('user_key'),
+      'redirect_uri': "https://westonkd.github.io/panda-face/redirect"
+    };
   }
 
   return undefined;
