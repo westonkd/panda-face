@@ -16,7 +16,7 @@ function tokenRequest(callback) {
     data,
     function(returnedData){
          console.log(returnedData);
-    }).fail(function(){
+    }).fail(function(result){
           console.log("error");
     });
 }
