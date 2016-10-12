@@ -5,7 +5,7 @@ $(document).ready(function(){
 
 function tokenRequest(callback) {
   var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
-  var postData = {
+  var formData = {
       'grant_type': 'authorization_code',
       'client_id': localStorage.getItem('app_id'),
       'client_secret': localStorage.getItem('user_key'),
@@ -16,21 +16,23 @@ function tokenRequest(callback) {
   console.log("======================================");
   console.log(tokenUrl);
   console.log("--------------------------------------");
-  console.log(data);
+  console.log(formData);
   console.log("======================================");
 
-$.ajax({
-  'type': 'POST',
-  'url': tokenUrl,
-  'data': postData,
-  'success': function(res) {
-    console.log(res);
-  },
-  'error': function(res) {
-    console.log("ERROR");
-    console.log(res);
-  }
-});
+  $.ajax({
+      url : tokenUrl,
+      type: "POST",
+      data : formData,
+      success: function(data, textStatus, jqXHR) {
+        console.log(data);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(error);
+        console.log(errorThrown);
+        console.log(textStatus);
+        console.log(jqXHR);
+      }
+  });
 }
 
 function oauthCode() {
