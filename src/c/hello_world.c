@@ -17,6 +17,7 @@ static Window *s_main_window;    // parent window
 static Layer *s_canvas_layer;    // Canvas layer
 static TextLayer *s_time_layer;  // Time label
 static int s_battery_level;
+static float s_panda_score;
 
 static char first_title_buffer[256];
 static char second_title_buffer[256];
@@ -37,7 +38,6 @@ static void update_time() {
   static char s_buffer[8];
   strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);
   strftime(date_buffer, sizeof(date_buffer), "%F", tick_time);
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox %s", date_buffer);
   
   text_layer_set_text(s_time_layer, s_buffer);
   
@@ -149,6 +149,17 @@ static void draw_assingment_info(GContext *ctx, GRect bounds) {
   draw_assignment(second_title_buffer, second_time_buffer, second_points_buffer, ctx, second_bounds, second_time_bounds);
 }
 
+static void draw_panda_score(GContext *ctx, GRect bounds, float score) {
+  // Set the line color
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  // Set the fill color
+  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  
+  GRect bar_bounds = GRect(0, bounds.size.h - ASSIGNMENT_HEIGHT - (INFOBAR_HEIGHT / 3), ((float) bounds.size.w) * score, INFOBAR_HEIGHT / 3);
+  graphics_draw_rect(ctx, bar_bounds);
+  graphics_fill_rect(ctx, bar_bounds, 0, GCornersAll);
+}
+
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Get bounds
   GRect bounds = layer_get_bounds(layer);
@@ -167,6 +178,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   
   // Draw date
   draw_date(ctx, bounds);
+  
+  // Draw Panda score
+  draw_panda_score(ctx, bounds, s_panda_score);
 }
 
 /*********************************************
@@ -179,6 +193,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *second_time_tuple = dict_find(iterator, MESSAGE_KEY_SECOND_DUE);
   Tuple *first_points_tuple = dict_find(iterator, MESSAGE_KEY_FIRST_POINTS);
   Tuple *second_points_tuple = dict_find(iterator, MESSAGE_KEY_SECOND_POINTS);
+  Tuple *complete_tuple = dict_find(iterator, MESSAGE_KEY_COMPLETE);
+  Tuple *total_tuple = dict_find(iterator, MESSAGE_KEY_TOTAL);
   
   if (first_title_tuple && second_title_tuple && first_time_tuple && second_time_tuple) {
     snprintf(first_title_buffer, sizeof(first_title_buffer), "%s", first_title_tuple->value->cstring);
@@ -188,6 +204,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     snprintf(first_points_buffer, sizeof(first_points_buffer), "%3s Pts. - ", first_points_tuple->value->cstring);
     snprintf(second_points_buffer, sizeof(second_points_buffer), "%3s Pts. - ", second_points_tuple->value->cstring);
     
+    s_panda_score = (float) complete_tuple->value->int32 / (float) total_tuple->value->int32;    
+      
     layer_mark_dirty(s_canvas_layer);
   }
 }

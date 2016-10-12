@@ -12,7 +12,9 @@
             "FIRST_DUE",
             "SECOND_DUE",
             "FIRST_POINTS",
-            "SECOND_POINTS"
+            "SECOND_POINTS",
+            "COMPLETE",
+            "TOTAL"
         ],
         "projectType": "native",
         "resources": {

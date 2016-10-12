@@ -51,6 +51,8 @@ ApiHelper.prototype.handleResponse = function(responseText, xhr, self) {
     'SECOND_ASSIGN': nextTwo.length > 1 ? nextTwo[1].title : this.defaultText,
     'SECOND_DUE': nextTwo.length > 0 ? self.timeUntilDue(nextTwo[1]) : self.defaultTime,
     'SECOND_POINTS': nextTwo.length > 0 ? nextTwo[1].assignment.points_possible.toString() : '0',
+    'TOTAL': data.length,
+    'COMPLETE': self.completeAssignments(data)
   };
   
   Pebble.sendAppMessage(dictionary, self.successHandler, self.errorHandler);
@@ -85,6 +87,17 @@ ApiHelper.prototype.xhrRequest = function(url, type, callback) {
     xhr.open(type, url);
     xhr.setRequestHeader("Authorization","Bearer " + this.token);
     xhr.send();
+};
+
+ApiHelper.prototype.completeAssignments = function(assignments) {
+  var complete = 0;
+  console.log(JSON.stringify(assignments));
+  for (var i = 0; i < assignments.length; i++) {
+    if (assignments[i].type === 'assignment' && assignments[i].assignment.has_submitted_submissions) {
+      complete++;
+    }
+  }
+  return complete;
 };
 
 
