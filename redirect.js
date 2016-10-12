@@ -32,11 +32,12 @@ function oauthCode() {
   var splitUrl = window.location.toString().split('?');
   if (splitUrl.length > 1 && splitUrl[1].indexOf('code') > -1) {
     queryHash = QueryStringToHash(splitUrl[1]);
-    return {
+    var data = {
       'code': queryHash.code,
       'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
       'not_working': localStorage.getItem('user_key') ? 'not null': 'null';
     };
+    return data;
   }
 
   return undefined;
