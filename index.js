@@ -4,10 +4,6 @@ $(document).ready(function(){
     var redirect = "https://westonkd.github.io/panda-face/redirect";
 
     if(verify(requiredFields)) {
-      // window.localStorage.setItem('user_key', $('#appKey').val());
-      // window.localStorage.setItem('base_url', $('#baseUrl').val());
-      // window.localStorage.setItem('app_id', $('#appID').val());
-
       var loginUrl = $('#baseUrl').val() +
         "/login/oauth2/auth?client_id=" +
         $('#appID').val() +
@@ -19,6 +15,7 @@ $(document).ready(function(){
         client_id: $('#appID').val(),
         client_secret: $('#appKey').val(),
         redirect_uri: "https://westonkd.github.io/panda-face/redirect",
+        base_url: $('#baseUrl').val(),
         login_url: loginUrl
       };
 
