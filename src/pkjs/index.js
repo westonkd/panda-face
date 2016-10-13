@@ -1,8 +1,13 @@
+// API HELPER
 function ApiHelper(baseUrl, token) {
   this.baseUrl = baseUrl;
   this.token = token;
   this.defaultText = "No Assignment";
   this.defaultTime = "NA";
+  
+  if (!this.token) {
+    this.sendError("Please authorize");
+  }
 }
 
 ApiHelper.prototype.fetchRespone = function(endpoint, type) {
@@ -25,7 +30,11 @@ ApiHelper.prototype.sendError = function(message) {
     'FIRST_ASSIGN': 'Error',
     'FIRST_DUE': message,
     'SECOND_ASSIGN': '',
-    'SECOND_DUE': ''
+    'SECOND_DUE': '',
+    'FIRST_POINTS': '0',
+    'SECOND_POINTS': '0',
+    'COMPLETE': 1,
+    'TOTAL': 1
   };
   Pebble.sendAppMessage(dictionary, this.successHandler, this.errorHandler);
 };
@@ -99,6 +108,8 @@ ApiHelper.prototype.completeAssignments = function(assignments) {
   return complete;
 };
 
+
+// PEBBLE EVENTS AND HELPERS
 function tokenRequest(code) {
   var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
   var formData = "grant_type=authorization_code" +
@@ -115,10 +126,9 @@ function tokenRequest(code) {
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
-        console.log(">>>>>>>>>>>>>>>");
-        console.log(xhr.responseText);
+        localStorage.setItem('access_token',JSON.parse(xhr.responseText).access_token);
+        console.log(JSON.parse(xhr.responseText).access_token);
       } else {
-        console.log("!!!!!!!!!!!!!!!");
         console.log("Error:" + xhr.status);
         console.log(xhr.responseText);
       }  
@@ -128,10 +138,13 @@ function tokenRequest(code) {
 }
 
 function getUpcomingEvents() {
-  var baseUrl = "http://wdransfield.instructure.com";
-  var token = "9336~4Q7vauyL6JxKma2JsE9dcWpoZb0p79f4rBHx9eD9KYvgpoKxLxgCWNTGX6W0CadA";
+  var baseUrl = localStorage.getItem('base_url');
+  var token = localStorage.getItem('access_token');
   var apiFilter = new ApiHelper(baseUrl, token);
-  apiFilter.fetchRespone("/api/v1/users/self/upcoming_events", "GET");
+  if (token && baseUrl) {
+    console.log("There is a token: " + token);
+    apiFilter.fetchRespone("/api/v1/users/self/upcoming_events", "GET");
+  }
 }
 
 Pebble.addEventListener('ready', 
@@ -154,7 +167,6 @@ Pebble.addEventListener('webviewclosed', function(e) {
   var data = JSON.parse(e.response);
   // Initial info
   if (data.return_type === "app_info") {
-    console.log("set stuff");
     // Store needed data
     localStorage.setItem('client_id', data.client_id);
     localStorage.setItem('client_secret', data.client_secret);

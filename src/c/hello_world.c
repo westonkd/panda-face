@@ -196,7 +196,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *complete_tuple = dict_find(iterator, MESSAGE_KEY_COMPLETE);
   Tuple *total_tuple = dict_find(iterator, MESSAGE_KEY_TOTAL);
   
-  if (first_title_tuple && second_title_tuple && first_time_tuple && second_time_tuple) {
+  if (first_title_tuple && second_title_tuple && first_time_tuple && second_time_tuple &&
+      first_points_tuple && second_points_tuple && complete_tuple && total_tuple) {
     snprintf(first_title_buffer, sizeof(first_title_buffer), "%s", first_title_tuple->value->cstring);
     snprintf(second_title_buffer, sizeof(second_title_buffer), "%s", second_title_tuple->value->cstring);
     snprintf(first_time_buffer, sizeof(first_time_buffer), "%s", first_time_tuple->value->cstring);
