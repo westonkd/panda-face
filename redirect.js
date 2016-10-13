@@ -3,39 +3,38 @@ $(document).ready(function(){
   window.location = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(oauthCode()));
 });
 
-function tokenRequest(callback) {
-  var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
-  var formData = {
-      'grant_type': 'authorization_code',
-      'client_id': localStorage.getItem('app_id'),
-      'client_secret': localStorage.getItem('user_key'),
-      'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
-      'code': localStorage.getItem('code')
-  };
+// function tokenRequest(callback) {
+//   var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
+//   var formData = {
+//       'grant_type': 'authorization_code',
+//       'client_id': localStorage.getItem('app_id'),
+//       'client_secret': localStorage.getItem('user_key'),
+//       'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
+//       'code': localStorage.getItem('code')
+//   };
 
-  $.ajax({
-      url : tokenUrl,
-      type: "POST",
-      data : formData,
-      success: function(data, textStatus, jqXHR) {
-        console.log(data);
-      },
-      error: function (xhr, textStatus, errorThrown) {
-        console.log(errorThrown);
-        console.log(textStatus);
-        console.log(xhr);
-      }
-  });
-}
+//   $.ajax({
+//       url : tokenUrl,
+//       type: "POST",
+//       data : formData,
+//       success: function(data, textStatus, jqXHR) {
+//         console.log(data);
+//       },
+//       error: function (xhr, textStatus, errorThrown) {
+//         console.log(errorThrown);
+//         console.log(textStatus);
+//         console.log(xhr);
+//       }
+//   });
+// }
 
 function oauthCode() {
   var splitUrl = window.location.toString().split('?');
   if (splitUrl.length > 1 && splitUrl[1].indexOf('code') > -1) {
     queryHash = QueryStringToHash(splitUrl[1]);
     var data = {
-      'code': queryHash.code,
-      'redirect_uri': "https://westonkd.github.io/panda-face/redirect",
-      'not_working': window.localStorage.getItem('user_key') ? 'not null': 'null';
+      return_type: 'code',
+      code: queryHash.code,
     };
     return data;
   }
