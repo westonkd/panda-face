@@ -99,26 +99,28 @@ ApiHelper.prototype.completeAssignments = function(assignments) {
   return complete;
 };
 
-function tokenRequest() {
+function tokenRequest(code) {
   var tokenUrl = localStorage.getItem('base_url') + "/login/oauth2/token";
   var formData = "grant_type=authorization_code" +
-                "&client_id=" + localStorage.getItem('base_url') +
-                "&client_secret=" + localStorage.getItem('user_key') +
-                "&redirect_uri=" + "https://westonkd.github.io/panda-face/redirect" +
-                "&code=" + localStorage.getItem('code');
+                "&client_id=" + localStorage.getItem('client_id') +
+                "&client_secret=" + localStorage.getItem('client_secret') +
+                "&redirect_uri=" + localStorage.getItem('redirect_uri') +
+                "&code=" + code;
   console.log("FormData: " + formData);
+  console.log("url: " + tokenUrl);
   
   var xhr = new XMLHttpRequest();
   xhr.open("POST", tokenUrl, true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.setRequestHeader("Content-length", formData.length);
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
         console.log(">>>>>>>>>>>>>>>");
         console.log(xhr.responseText);
       } else {
+        console.log("!!!!!!!!!!!!!!!");
         console.log("Error:" + xhr.status);
+        console.log(xhr.responseText);
       }  
     }
   };
@@ -149,7 +151,20 @@ Pebble.addEventListener("showConfiguration", function() {
 });
 
 Pebble.addEventListener('webviewclosed', function(e) {
-  console.log("++++++");
-  console.log(e.response);
-  //tokenRequest();
+  var data = JSON.parse(e.response);
+  // Initial info
+  if (data.return_type === "app_info") {
+    console.log("set stuff");
+    // Store needed data
+    localStorage.setItem('client_id', data.client_id);
+    localStorage.setItem('client_secret', data.client_secret);
+    localStorage.setItem('redirect_uri', data.redirect_uri);
+    localStorage.setItem('base_url', data.base_url);
+    
+    // Get the code
+    Pebble.openURL(data.login_url);
+    //Code
+  } else if (data.return_type === "code") {
+    tokenRequest(data.code);
+  }
 });
