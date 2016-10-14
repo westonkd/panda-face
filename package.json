@@ -21,13 +21,20 @@
         ],
         "projectType": "native",
         "resources": {
-            "media": []
+            "media": [
+                {
+                    "file": "images/icon",
+                    "name": "ICON",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                }
+            ]
         },
         "sdkVersion": "3",
         "targetPlatforms": [
             "aplite",
             "basalt",
-            "chalk"
+            "diorite"
         ],
         "uuid": "3adcb4c2-20aa-42a0-ab15-333ffb519a82",
         "watchapp": {

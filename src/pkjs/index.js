@@ -42,6 +42,12 @@ ApiHelper.prototype.sendError = function(message) {
 ApiHelper.prototype.handleResponse = function(responseText, xhr, self) {
   localStorage.setItem('assignment_data', responseText);
   var data = JSON.parse(responseText);
+  
+  if (data.errors) {
+    Pebble.openURL('https://westonkd.github.io/panda-face/');
+    self.sendError('reauthorize');
+  }
+  
   var nextTwo = [];
   
   // Grab the next two assignments

@@ -10,14 +10,15 @@
 #define ASSIGNMENT_HEIGHT 90
 #define BATTERY_WIDTH 30
 
-#define INBOX_SIZE 1024
-#define OUTBOX_SIZE 256
+#define INBOX_SIZE 2048
+#define OUTBOX_SIZE 1024
 
 static Window *s_main_window;    // parent window
 static Layer *s_canvas_layer;    // Canvas layer
 static TextLayer *s_time_layer;  // Time label
 static int s_battery_level;
 static float s_panda_score;
+static int16_t prev_z;
 
 static char first_title_buffer[256];
 static char second_title_buffer[256];
@@ -43,7 +44,7 @@ static void update_time() {
   
   layer_mark_dirty(s_canvas_layer);
   
-  if (tick_time->tm_min % 5 == 0) {
+  if (tick_time->tm_min % 10 == 0) {
     // Send request to update assignment data
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
@@ -66,6 +67,33 @@ static void battery_callback(BatteryChargeState state) {
   
   // Redraw
   layer_mark_dirty(s_canvas_layer);
+}
+
+/***********************************************
+* Tap callback
+***********************************************/
+static void accel_data_handler(AccelData *data, uint32_t num_samples) {
+  // Read sample 0's x, y, and z values
+  int16_t x = data[0].x;
+  int16_t y = data[0].y;
+  int16_t z = data[0].z;
+
+  // Determine if the sample occured during vibration, and when it occured
+  bool did_vibrate = data[0].did_vibrate;
+  uint64_t timestamp = data[0].timestamp;
+
+  if(!did_vibrate) {
+    int16_t diff = prev_z - z;
+    if (diff > 1300 || diff < -1300) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "t: %llu, x: %d, y: %d, z: %d",
+                                                          timestamp, x, y, z);  
+      prev_z = z;
+    }
+    
+  } else {
+    // Discard with a warning
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Vibration occured during collection");
+  }
 }
 
 /***********************************************
@@ -283,6 +311,11 @@ static void init() {
   
   // Register Battery handler and initialize 
   battery_state_service_subscribe(battery_callback);
+  
+  // Tap handler
+  uint32_t num_samples = 1;
+  //accel_data_service_subscribe(num_samples, accel_data_handler);
+
 }
 
 static void deinit() {
